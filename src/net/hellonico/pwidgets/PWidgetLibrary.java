@@ -27,12 +27,8 @@
 
 package net.hellonico.pwidgets;
 
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -40,13 +36,10 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -102,41 +95,30 @@ public class PWidgetLibrary {
 	
 	public void disableMainWindow() {
 		myParent.frame = new net.hellonico.pwidgets.EmptyFrame();
-		//myParent.frame.setVisible(false);
+	}
+	
+	public void addFileDropFrame() {
+		new FileDropFrame();
 	}
 
-	public void enableDragAndDrop() {
+	public void enableDragAndDrop(final Component c) {
 		try {
-			String methodName = "onDragAndDrop";
+			String methodName = "filesDropped";
 			final Method m = myParent.getClass().getMethod(methodName,
-					new Class[] { DropTargetDropEvent.class });
-
-			DropTarget dt = new DropTarget(myParent.frame,
-					new DropTargetListener() {
-						public void dragEnter(DropTargetDragEvent arg0) {
-						}
-
-						public void dragExit(DropTargetEvent arg0) {
-						}
-
-						public void dragOver(DropTargetDragEvent arg0) {
-						}
-
-						public void drop(DropTargetDropEvent event) {
+					new Class[] { Component.class, File[].class});
+			
+			new FileDrop(System.out, c,
+					new FileDrop.Listener() {
+						public void filesDropped(java.io.File[] files) {
 							try {
-								m.invoke(myParent, new Object[] { event });
+								m.invoke(myParent, new Object[] { c, files });
 							} catch (Exception e) {
-								System.out.println(e.getMessage());
+								e.printStackTrace();
 							}
-						}
-
-						public void dropActionChanged(DropTargetDragEvent arg0) {
-						}
-
-					});
-			myParent.frame.setDropTarget(dt);
+						} 
+					});	
 		} catch (Exception e) {
-			e.getMessage();
+			e.printStackTrace();
 		}
 	}
 

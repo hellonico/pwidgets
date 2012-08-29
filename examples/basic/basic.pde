@@ -10,6 +10,7 @@ JComboBox box1;
 JCheckBox box2; 
 JButton hello;
 
+// dialog box example
 void setup() {
   widgets = new PWidgetLibrary(this);
   
